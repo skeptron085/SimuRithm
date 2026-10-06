@@ -1,0 +1,1087 @@
+/* ==========================================================
+   SimuRithm Dashboard
+   Version : Release 1.1
+========================================================== */
+
+:root{
+
+    --primary:#0d6efd;
+    --secondary:#6c757d;
+    --success:#198754;
+    --info:#0dcaf0;
+    --warning:#ffc107;
+    --danger:#dc3545;
+
+    --light:#f8f9fa;
+    --dark:#212529;
+
+    --border:#dee2e6;
+
+    --radius:12px;
+
+    --shadow:
+        0 4px 12px rgba(0,0,0,.08);
+
+    --transition:.25s;
+
+}
+
+/* ==========================================================
+   GENERAL
+========================================================== */
+
+body{
+
+    background:#f5f7fb;
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    color:#333;
+
+}
+
+.container-fluid{
+
+    padding-left:25px;
+
+    padding-right:25px;
+
+}
+
+/* ==========================================================
+   NAVBAR
+========================================================== */
+
+.navbar{
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1030;
+
+    box-shadow:var(--shadow);
+
+}
+
+.navbar-brand{
+
+    font-size:22px;
+
+    font-weight:700;
+
+}
+
+/* ==========================================================
+   CARDS
+========================================================== */
+
+.card{
+
+    border:none;
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--shadow);
+
+    margin-bottom:25px;
+
+    transition:var(--transition);
+
+}
+
+.card:hover{
+
+    transform:translateY(-3px);
+
+}
+
+.card-header{
+
+    background:white;
+
+    font-weight:600;
+
+    border-bottom:1px solid var(--border);
+
+    border-radius:var(--radius)
+        var(--radius)
+        0
+        0 !important;
+
+}
+
+.card-body{
+
+    padding:20px;
+
+}
+
+/* ==========================================================
+   SECTION TITLE
+========================================================== */
+
+.section-title{
+
+    font-size:18px;
+
+    font-weight:700;
+
+    color:var(--primary);
+
+}
+
+.section-subtitle{
+
+    color:#777;
+
+    font-size:14px;
+
+}
+
+/* ==========================================================
+   STATISTIC CARDS
+========================================================== */
+
+.stat-card{
+
+    border-radius:15px;
+
+    color:white;
+
+    padding:25px;
+
+    box-shadow:var(--shadow);
+
+    transition:.3s;
+
+}
+
+.stat-card:hover{
+
+    transform:scale(1.03);
+
+}
+
+.stat-value{
+
+    font-size:34px;
+
+    font-weight:bold;
+
+}
+
+.stat-title{
+
+    font-size:15px;
+
+    opacity:.9;
+
+}
+
+.stat-icon{
+
+    font-size:38px;
+
+    opacity:.35;
+
+}
+
+.bg-gradient-primary{
+
+    background:
+        linear-gradient(
+            135deg,
+            #0d6efd,
+            #4f9bff
+        );
+
+}
+
+.bg-gradient-success{
+
+    background:
+        linear-gradient(
+            135deg,
+            #198754,
+            #39c37f
+        );
+
+}
+
+.bg-gradient-danger{
+
+    background:
+        linear-gradient(
+            135deg,
+            #dc3545,
+            #ff6b81
+        );
+
+}
+
+.bg-gradient-warning{
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffc107,
+            #ffdd57
+        );
+
+    color:#333;
+
+}
+
+.bg-gradient-info{
+
+    background:
+        linear-gradient(
+            135deg,
+            #0dcaf0,
+            #61dafb
+        );
+
+}
+
+/* ==========================================================
+   TABLES
+========================================================== */
+
+.table{
+
+    margin-bottom:0;
+
+}
+
+.table thead{
+
+    background:var(--primary);
+
+    color:white;
+
+}
+
+.table th{
+
+    font-size:14px;
+
+    vertical-align:middle;
+
+}
+
+.table td{
+
+    vertical-align:middle;
+
+    font-size:14px;
+
+}
+
+.table-hover tbody tr:hover{
+
+    background:#eef5ff;
+
+}
+
+/* ==========================================================
+   DATATABLES
+========================================================== */
+
+.dataTables_wrapper{
+
+    padding-top:10px;
+
+}
+
+.dataTables_filter input{
+
+    border-radius:8px;
+
+}
+
+.dataTables_length select{
+
+    border-radius:8px;
+
+}
+
+/* ==========================================================
+   BUTTONS
+========================================================== */
+
+.btn{
+
+    border-radius:8px;
+
+}
+
+.btn-primary{
+
+    box-shadow:
+        0 3px 8px rgba(13,110,253,.25);
+
+}
+
+.btn-success{
+
+    box-shadow:
+        0 3px 8px rgba(25,135,84,.25);
+
+}
+
+/* ==========================================================
+   UPLOAD AREA
+========================================================== */
+
+.upload-area{
+
+    border:3px dashed #b7c6dd;
+
+    border-radius:15px;
+
+    padding:50px;
+
+    background:white;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    text-align:center;
+
+}
+
+.upload-area:hover{
+
+    background:#eef6ff;
+
+}
+
+.upload-area.dragover{
+
+    border-color:var(--primary);
+
+    background:#dfeeff;
+
+}
+
+.upload-icon{
+
+    font-size:65px;
+
+    color:var(--primary);
+
+}
+
+.upload-text{
+
+    margin-top:15px;
+
+    font-size:18px;
+
+}
+
+/* ==========================================================
+   PROGRESS BAR
+========================================================== */
+
+.progress{
+
+    height:20px;
+
+    border-radius:10px;
+
+}
+
+/* ==========================================================
+   BADGES
+========================================================== */
+
+.badge{
+
+    font-size:13px;
+
+}
+
+/* ==========================================================
+   CHARTS
+========================================================== */
+
+.chart-container{
+
+    position:relative;
+
+    width:100%;
+
+    height:500px;
+
+}
+
+/* ==========================================================
+   LOADING
+========================================================== */
+
+.loading-overlay{
+
+    position:fixed;
+
+    top:0;
+
+    left:0;
+
+    width:100%;
+
+    height:100%;
+
+    background:
+        rgba(255,255,255,.75);
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:9999;
+
+}
+
+.loading-spinner{
+
+    width:70px;
+
+    height:70px;
+
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+footer{
+
+    background:white;
+
+    margin-top:40px;
+
+    box-shadow:
+        0 -2px 8px rgba(0,0,0,.05);
+
+}
+
+/* ==========================================================
+   SCROLLBAR
+========================================================== */
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#b0b8c4;
+
+    border-radius:5px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#7f8a99;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media(max-width:992px){
+
+    .stat-card{
+
+        margin-bottom:15px;
+
+    }
+
+    .chart-container{
+
+        height:350px;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .container-fluid{
+
+        padding-left:15px;
+
+        padding-right:15px;
+
+    }
+
+    .upload-area{
+
+        padding:30px;
+
+    }
+
+    .stat-value{
+
+        font-size:26px;
+
+    }
+
+    .chart-container{
+
+        height:300px;
+
+    }
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| SimuRithm Layout
+|--------------------------------------------------------------------------
+| Release 1.3
+|--------------------------------------------------------------------------
+*/
+
+.simurithm-layout {
+    display: flex;
+
+    min-height: calc(100vh - 60px);
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Sidebar
+|--------------------------------------------------------------------------
+*/
+
+.simurithm-sidebar {
+
+    position: fixed;
+
+    top: 60px;
+    left: 0;
+
+    width: 260px;
+
+    height: calc(100vh - 60px);
+
+    background: #111827;
+
+    color: #ffffff;
+
+    display: flex;
+
+    flex-direction: column;
+
+    z-index: 1000;
+
+    overflow-y: auto;
+
+    box-shadow: 3px 0 12px rgba(0, 0, 0, 0.12);
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Sidebar Brand
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-brand {
+
+    height: 75px;
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 0 20px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+}
+
+
+.brand-icon {
+
+    width: 40px;
+
+    height: 40px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    margin-right: 12px;
+
+}
+
+
+.brand-name {
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+
+}
+
+
+.brand-version {
+
+    margin-top: 3px;
+
+    font-size: 11px;
+
+    color: #9ca3af;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Navigation
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-navigation {
+
+    flex: 1;
+
+    padding: 15px 12px;
+
+}
+
+
+.sidebar-section-title {
+
+    padding: 10px 12px 8px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    color: #6b7280;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Sidebar Item
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-item {
+
+    display: flex;
+
+    align-items: center;
+
+    width: 100%;
+
+    min-height: 43px;
+
+    padding: 9px 12px;
+
+    margin-bottom: 3px;
+
+    border-radius: 8px;
+
+    color: #d1d5db;
+
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+
+}
+
+
+.sidebar-item:hover {
+
+    background: rgba(255, 255, 255, 0.07);
+
+    color: #ffffff;
+
+}
+
+
+.sidebar-item.active {
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font-weight: 600;
+
+}
+
+
+.sidebar-item.disabled {
+
+    opacity: 0.55;
+
+    cursor: default;
+
+}
+
+
+.sidebar-item.disabled:hover {
+
+    background: transparent;
+
+    color: #d1d5db;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Sidebar Icons
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-icon {
+
+    width: 30px;
+
+    min-width: 30px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 16px;
+
+}
+
+
+.sidebar-label {
+
+    margin-left: 8px;
+
+    font-size: 13px;
+
+    white-space: nowrap;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Divider
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-divider {
+
+    height: 1px;
+
+    margin: 15px 10px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Sidebar Footer
+|--------------------------------------------------------------------------
+*/
+
+.sidebar-footer {
+
+    padding: 15px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+}
+
+
+.sidebar-status {
+
+    display: flex;
+
+    align-items: center;
+
+    font-size: 12px;
+
+    color: #9ca3af;
+
+}
+
+
+.status-dot {
+
+    width: 8px;
+
+    height: 8px;
+
+    margin-right: 8px;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Main Content
+|--------------------------------------------------------------------------
+*/
+
+.simu-main-content {
+
+    margin-left: 260px;
+
+    width: calc(100% - 260px);
+
+    min-height: calc(100vh - 60px);
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Mobile
+|--------------------------------------------------------------------------
+*/
+
+@media (max-width: 768px) {
+
+    .simurithm-sidebar {
+
+        width: 230px;
+
+        transform: translateX(-100%);
+
+        transition: transform 0.25s ease;
+
+    }
+
+
+    .simurithm-sidebar.show {
+
+        transform: translateX(0);
+
+    }
+
+
+    .simu-main-content {
+
+        margin-left: 0;
+
+        width: 100%;
+
+    }
+
+}
+
+/* ==========================================================
+   WORKFLOW PAGES
+========================================================== */
+
+.simurithm-sidebar {
+    padding: 0;
+    background: #183766;
+}
+
+.sidebar-brand-link {
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, .1);
+}
+
+.sidebar-logo {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: #198754;
+    font-size: 19px;
+}
+
+.sidebar-brand-text {
+    display: grid;
+    gap: 3px;
+}
+
+.sidebar-brand-text strong {
+    font-size: 15px;
+    line-height: 1.2;
+}
+
+.sidebar-brand-text small {
+    color: #aab6c2;
+    font-size: 11px;
+}
+
+.sidebar-navigation {
+    padding: 18px 12px;
+}
+
+.sidebar-section-title {
+    padding: 7px 10px 12px;
+    color: #91a0ae;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.workflow-navigation {
+    display: grid;
+    gap: 5px;
+}
+
+.sidebar-menu-item {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    color: #d5dde4;
+    text-decoration: none;
+    transition: background-color .18s ease, color .18s ease;
+}
+
+.sidebar-menu-item:hover {
+    background: rgba(255, 255, 255, .08);
+    color: #fff;
+}
+
+.sidebar-menu-item.active {
+    background: #198754;
+    color: #fff;
+}
+
+.sidebar-step-number {
+    width: 24px;
+    color: #aab6c2;
+    font-size: 10px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.sidebar-menu-item.active .sidebar-step-number {
+    color: #d8f3e4;
+}
+
+.sidebar-menu-icon {
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-menu-text {
+    font-size: 13px;
+}
+
+.sidebar-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 18px;
+    border-top: 1px solid rgba(255, 255, 255, .1);
+    color: #d5dde4;
+    font-size: 12px;
+}
+
+.sidebar-footer small {
+    margin-left: auto;
+    color: #aab6c2;
+}
+
+.sidebar-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #45c486;
+}
+
+.workflow-page[hidden] {
+    display: none !important;
+}
+
+.workflow-page-header {
+    margin: 0 0 22px;
+}
+
+.workflow-step {
+    margin-bottom: 6px;
+    color: #198754;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .8px;
+}
+
+.workflow-step span {
+    color: #82909c;
+}
+
+.workflow-page-header h1 {
+    margin: 0;
+    color: #202b35;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.workflow-page-header p {
+    margin: 5px 0 0;
+    color: #687681;
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .simurithm-sidebar {
+        z-index: 1040;
+        box-shadow: 6px 0 24px rgba(0, 0, 0, .24);
+    }
+
+    .workflow-page-header h1 {
+        font-size: 23px;
+    }
+}
