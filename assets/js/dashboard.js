@@ -1991,7 +1991,7 @@ function loadBenchmark(results){
 
             <td>
 
-                ${result.f1 ?? "-"}
+                ${result.f1_score ?? result.f1 ?? "-"}
 
             </td>
 

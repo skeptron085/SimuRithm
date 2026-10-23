@@ -137,6 +137,15 @@ if (!is_array($data)) {
 |--------------------------------------------------------------------------
 */
 
+$rawSelectionMode = $data["selection_mode"] ?? "manual";
+if (!is_string($rawSelectionMode)) {
+    jsonResponse(false, "Selection mode must be a string.", [], 400);
+}
+$selectionMode = strtolower(trim($rawSelectionMode));
+if (!in_array($selectionMode, ["automatic", "manual"], true)) {
+    jsonResponse(false, "Selection mode must be either automatic or manual.", [], 400);
+}
+
 $rawFilePath = $data["file_path"] ?? "";
 if (!is_string($rawFilePath) && !is_numeric($rawFilePath)) {
     jsonResponse(false, "Dataset file path must be a string.", [], 400);
@@ -256,18 +265,12 @@ if (!is_array($yVariables)) {
 |--------------------------------------------------------------------------
 */
 
-if (count($xVariables) === 0) {
-
+if ($selectionMode === "manual" && count($xVariables) === 0) {
     jsonResponse(
-
         false,
-
-        "Please select at least one X variable.",
-
+        "Please select at least one X variable in Manual mode.",
         [],
-
         400
-
     );
 }
 
@@ -352,8 +355,8 @@ if ($categoryCount < 1 || $categoryCount > 5) {
 
 $requiresTarget = count(array_diff(array_keys($algorithmsByCategory), $featureOnlyCategories)) > 0;
 
-if ($requiresTarget && count($yVariables) === 0) {
-    jsonResponse(false, "Please select at least one target.", [], 400);
+if ($selectionMode === "manual" && $requiresTarget && count($yVariables) === 0) {
+    jsonResponse(false, "Please select at least one target in Manual mode for the selected algorithms.", [], 400);
 }
 
 
@@ -438,34 +441,22 @@ $yVariables = array_values(
 |--------------------------------------------------------------------------
 */
 
-if (count($xVariables) === 0) {
-
+if ($selectionMode === "manual" && count($xVariables) === 0) {
     jsonResponse(
-
         false,
-
         "No valid X variables were selected.",
-
         [],
-
         400
-
     );
 }
 
 
-if ($requiresTarget && count($yVariables) === 0) {
-
+if ($selectionMode === "manual" && $requiresTarget && count($yVariables) === 0) {
     jsonResponse(
-
         false,
-
         "No valid Y variables were selected.",
-
         [],
-
         400
-
     );
 }
 
@@ -476,13 +467,9 @@ if ($requiresTarget && count($yVariables) === 0) {
 |--------------------------------------------------------------------------
 */
 
-$overlap = $requiresTarget ? array_intersect(
-
-    $xVariables,
-
-    $yVariables
-
-) : [];
+$overlap = ($selectionMode === "manual" && $requiresTarget)
+    ? array_intersect($xVariables, $yVariables)
+    : [];
 
 
 if (count($overlap) > 0) {
@@ -628,9 +615,12 @@ foreach ($algorithmsByCategory as $modelCategory => $categoryModels) {
     $usedCompatibilityModels = $usedCompatibilityModels || count($compatibilityModels) > 0;
     $flaskPayload = [
         "file_path" => $filePath,
+        "selection_mode" => $selectionMode,
         "category" => $modelCategory,
-        "x_columns" => $xVariables,
-        "y_columns" => $yVariables,
+        // Automatic mode intentionally sends empty arrays so Flask can infer
+        // suitable variables from the dataset instead of reusing hidden UI values.
+        "x_columns" => $selectionMode === "automatic" ? [] : $xVariables,
+        "y_columns" => $selectionMode === "automatic" ? [] : $yVariables,
         "algorithms" => $flaskAlgorithms,
         "selected_algorithms" => $categoryModels,
         "enable_tuning" => ENABLE_AUTO_TUNING
