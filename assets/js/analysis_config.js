@@ -40,7 +40,9 @@ let analysisConfig = {
 
     algorithms: [],
 
-    task: ""
+    task: "",
+
+    selection_mode: "automatic"
 
 };
 
@@ -79,6 +81,12 @@ $(document).ready(function(){
 
 
 function initializeAnalysisConfig(){
+
+    // Keep the variable controls synchronized with Automatic / Manual mode.
+    $("input[name=\"selectionMode\"]").on("change", function(){
+        updateSelectionModeUI();
+    });
+    updateSelectionModeUI();
 
     /*
     ----------------------------------------------------------
@@ -614,172 +622,127 @@ function populateVariableSelectors(columns){
 |--------------------------------------------------------------------------
 */
 
-function collectAnalysisConfiguration(){
+function getAnalysisSelectionMode() {
+    return $('input[name="selectionMode"]:checked').val() || "automatic";
+}
 
-    /*
-    ----------------------------------------------------------
-    Get X variables
-    ----------------------------------------------------------
-    */
+function updateSelectionModeUI(){
+    const mode = getAnalysisSelectionMode();
+    analysisConfig.selection_mode = mode;
 
-    const xVariables =
-        $("#xVariables")
-            .val() || [];
+    const automatic = mode === "automatic";
+    $("#variableSelectionSection").toggleClass("d-none", automatic);
 
-
-    /*
-    ----------------------------------------------------------
-    Get Y variables
-    ----------------------------------------------------------
-    */
-
-    const yVariables =
-        $("#yVariables")
-            .val() || [];
+    if($("#selectionModeHelp").length){
+        $("#selectionModeHelp").text(automatic
+            ? "SimuRithm will infer suitable input and target variables when required. Choose the algorithm models below."
+            : "Select the input variables and target variables required by your selected models.");
+    }
+}
 
 
-    /*
-    ----------------------------------------------------------
-    Get algorithm
-    ----------------------------------------------------------
-    */
+function collectAnalysisConfiguration() {
+    const selectionMode = getAnalysisSelectionMode();
+    const isAutomatic = selectionMode === "automatic";
+
+    // Automatic mode lets SimuRithm infer the variables.
+    const xVariables = isAutomatic
+        ? []
+        : ($("#xVariables").val() || []);
+
+    const yVariables = isAutomatic
+        ? []
+        : ($("#yVariables").val() || []);
 
     const category = $("#algorithmCategory").val() || "";
-    analysisConfig.category = category;
-    const algorithms = analysisConfig.algorithms;
 
+    // Keep the selected models from all chosen categories.
+    const algorithms = analysisConfig.algorithms || [];
 
-    /*
-    ----------------------------------------------------------
-    Validate X
-    ----------------------------------------------------------
-    */
-
-    if(
-        xVariables.length === 0
-    ){
-
-        showWarning(
-            "Please select at least one X variable."
-        );
-
-        return;
-
-    }
-
-
-    /*
-    ----------------------------------------------------------
-    Validate Y
-    ----------------------------------------------------------
-    */
-
-    const requiresTarget = algorithms.some(function(model){
-        return !featureOnlyCategories.has(model.category);
-    });
-
-    if(requiresTarget && yVariables.length === 0){
-
-        showWarning(
-            "Please select at least one Y variable."
-        );
-
-        return;
-
-    }
-
-
-    /*
-    ----------------------------------------------------------
-    Validate Algorithm
-    ----------------------------------------------------------
-    */
-
+    // At least one model must be selected.
     const minimumAlgorithms = 1;
     const maximumAlgorithms = 5;
 
-    if(algorithms.length < minimumAlgorithms || algorithms.length > maximumAlgorithms){
-
+    if (
+        algorithms.length < minimumAlgorithms ||
+        algorithms.length > maximumAlgorithms
+    ) {
         showWarning(
-            "Select between " + minimumAlgorithms + " and " + maximumAlgorithms + " algorithms."
+            "Select between " +
+            minimumAlgorithms +
+            " and " +
+            maximumAlgorithms +
+            " algorithms."
         );
-
         return;
-
     }
 
+    const invalidModels = algorithms.filter(function (model) {
+    return (
+        !model ||
+        !algorithmOptions[model.category] ||
+        !algorithmOptions[model.category].includes(model.algorithm)
+        );
+    });
 
-    /*
-    ----------------------------------------------------------
-    Prevent X and Y overlap
-    ----------------------------------------------------------
-    */
+    if (invalidModels.length > 0) {
+        showWarning(
+        "One or more selected models have an invalid category or algorithm. " +
+        "Please review your selected models."
+    );
+        return;
+    }
 
-    const overlap = requiresTarget ?
-        xVariables.filter(function(variable){
+    // Determine whether any selected model needs a target variable.
+    const requiresTarget = algorithms.some(function (model) {
+        return !featureOnlyCategories.has(model.category);
+    });
 
-            return yVariables.includes(
-                variable
+    // Validate X variables only in Manual mode.
+    if (!isAutomatic && xVariables.length === 0) {
+        showWarning("Please select at least one X variable.");
+        return;
+    }
+
+    // Validate Y variables only in Manual mode and when needed.
+    if (
+        !isAutomatic &&
+        requiresTarget &&
+        yVariables.length === 0
+    ) {
+        showWarning("Please select at least one Y variable.");
+        return;
+    }
+
+    // A variable cannot be both X and Y in Manual mode.
+    if (!isAutomatic && requiresTarget) {
+        const overlap = xVariables.filter(function (variable) {
+            return yVariables.includes(variable);
+        });
+
+        if (overlap.length > 0) {
+            showWarning(
+                "The same variable cannot be used as both X and Y: " +
+                overlap.join(", ")
             );
-
-        }) : [];
-
-
-    if(
-        overlap.length > 0
-    ){
-
-        showWarning(
-
-            "The same variable cannot be used as both X and Y: " +
-            overlap.join(", ")
-
-        );
-
-        return;
-
+            return;
+        }
     }
 
-
-    /*
-    ----------------------------------------------------------
-    Store configuration
-    ----------------------------------------------------------
-    */
-
-    analysisConfig.x_variables =
-        xVariables;
-
-
-    analysisConfig.y_variables =
-        yVariables;
-
-
+    // Save the configuration before sending it to PHP.
+    analysisConfig.selection_mode = selectionMode;
+    analysisConfig.x_variables = xVariables;
+    analysisConfig.y_variables = yVariables;
     analysisConfig.category = category;
-
     analysisConfig.algorithms = algorithms;
-
-
-    /*
-    ----------------------------------------------------------
-    Debug
-    ----------------------------------------------------------
-    */
 
     console.log(
         "Analysis configuration:",
-        analysisConfig
+        JSON.stringify(analysisConfig, null, 2)
     );
 
-
-    /*
-    ----------------------------------------------------------
-    Start final analysis
-    ----------------------------------------------------------
-    */
-
+    // Continue using the existing AJAX workflow.
     runConfiguredAnalysis();
-
 }
 
 
@@ -823,7 +786,9 @@ function runConfiguredAnalysis(){
 
     updateLoadingProgress(
         10,
-        "Preparing selected variables..."
+        analysisConfig.selection_mode === "automatic"
+            ? "Inferring suitable variables..."
+            : "Preparing selected variables..."
     );
 
 
@@ -855,6 +820,9 @@ function runConfiguredAnalysis(){
 
                 file_path:
                     analysisConfig.file_path,
+
+                selection_mode:
+                    analysisConfig.selection_mode || getAnalysisSelectionMode(),
 
                 x_variables:
                     analysisConfig.x_variables,
@@ -1539,10 +1507,15 @@ function resetAnalysisConfiguration(){
 
         algorithms: [],
 
-        task: ""
+        task: "",
+
+        selection_mode: "automatic"
 
     };
 
+
+    $("input[name=\"selectionMode\"][value=\"automatic\"]").prop("checked", true);
+    updateSelectionModeUI();
 
     $("#xVariables").val([]);
 
@@ -1568,5 +1541,7 @@ function resetAnalysisConfiguration(){
 |--------------------------------------------------------------------------
 */
 
-window.SimuRithmAnalysisConfig =
-    analysisConfig;
+Object.defineProperty(window, "SimuRithmAnalysisConfig", {
+    configurable: true,
+    get: function(){ return analysisConfig; }
+});
