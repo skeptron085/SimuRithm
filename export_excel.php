@@ -9,7 +9,9 @@
 ==========================================================
 */
 
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
 /*
 ==========================================================
@@ -822,14 +824,9 @@ if (!empty($correlation)) {
 
     foreach ($columns as $column) {
 
-        $correlationSheet->setCellValueByColumnAndRow(
-
-            $columnIndex,
-
-            3,
-
+        $correlationSheet->setCellValue(
+            \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($columnIndex) . "3",
             $column
-
         );
 
         $columnIndex++;
@@ -864,14 +861,9 @@ if (!empty($correlation)) {
                 $value = round($value, 4);
             }
 
-            $correlationSheet->setCellValueByColumnAndRow(
-
-                $columnIndex,
-
-                $rowNumber,
-
+            $correlationSheet->setCellValue(
+                \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($columnIndex) . $rowNumber,
                 $value
-
             );
 
             $columnIndex++;
@@ -1191,78 +1183,25 @@ $benchmarkSheet->getStyle("A1")->applyFromArray([
 ==========================================================
 */
 
-$task = strtolower(
-
-    $analysis["task_type"] ?? ""
-
-);
-
 $row = 3;
 
-/*
-==========================================================
- Classification Benchmark
-==========================================================
-*/
-
-if ($task == "classification") {
-
-    $headers = [
-
-        "Algorithm",
-
-        "Accuracy",
-
-        "Precision",
-
-        "Recall",
-
-        "F1 Score",
-
-        "CV Score",
-
-        "Execution Time (s)"
-
-    ];
-}
-
-/*
-==========================================================
- Regression Benchmark
-==========================================================
-*/ elseif ($task == "regression") {
-
-    $headers = [
-
-        "Algorithm",
-
-        "RMSE",
-
-        "R² Score",
-
-        "CV Score",
-
-        "Execution Time (s)"
-
-    ];
-}
-
-/*
-==========================================================
- Clustering Benchmark
-==========================================================
-*/ else {
-
-    $headers = [
-
-        "Algorithm",
-
-        "Silhouette",
-
-        "Execution Time (s)"
-
-    ];
-}
+$headers = [
+    "Rank",
+    "Category",
+    "Algorithm",
+    "Target",
+    "Primary Metric",
+    "Score",
+    "Accuracy",
+    "Cross Validation",
+    "Precision",
+    "Recall",
+    "F1",
+    "R² / RMSE",
+    "Silhouette",
+    "Time (sec)",
+    "Status"
+];
 
 /*
 ==========================================================
@@ -1274,14 +1213,9 @@ $column = 1;
 
 foreach ($headers as $header) {
 
-    $benchmarkSheet->setCellValueByColumnAndRow(
-
-        $column,
-
-        $row,
-
+    $benchmarkSheet->setCellValue(
+        \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($column) . $row,
         $header
-
     );
 
     $column++;
@@ -1324,93 +1258,52 @@ $row = 4;
 
 foreach ($results as $result) {
 
-    $column = 1;
+    if (!is_array($result)) {
+        continue;
+    }
 
-    foreach ($headers as $header) {
+    $primaryMetric = $result["primary_metric"]
+        ?? (isset($result["accuracy"]) ? "Accuracy"
+            : (isset($result["r2"]) ? "R²"
+                : (isset($result["silhouette"]) ? "Silhouette" : "-")));
+    $primaryScore = $result["primary_score"]
+        ?? $result["accuracy"]
+        ?? $result["r2"]
+        ?? $result["silhouette"]
+        ?? "-";
+    $crossValidation = $result["cv_score"]
+        ?? $result["cross_validation_score"]
+        ?? $result["cross_val_score"]
+        ?? (!empty($result["cv_error"]) ? "Unavailable: " . $result["cv_error"] : "-");
+    $status = !empty($result["error"])
+        ? "Not run: " . $result["error"]
+        : ($result["status"] ?? (!empty($result["is_recommended"]) ? "Recommended" : "Completed"));
+    $values = [
+        !empty($result["error"]) ? "-" : ($result["category_rank"] ?? "-"),
+        $result["category"] ?? $result["task"] ?? "-",
+        $result["algorithm"] ?? $result["model"] ?? "-",
+        $result["target"] ?? "-",
+        $primaryMetric,
+        $primaryScore,
+        $result["accuracy"] ?? "-",
+        $crossValidation,
+        $result["precision"] ?? "-",
+        $result["recall"] ?? "-",
+        $result["f1_score"] ?? $result["f1"] ?? "-",
+        $result["r2"] ?? $result["rmse"] ?? "-",
+        $result["silhouette"] ?? "-",
+        $result["execution_time"] ?? "-",
+        $status
+    ];
 
-        switch ($header) {
-
-            case "Algorithm":
-
-                $value = $result["algorithm"] ?? "-";
-
-                break;
-
-            case "Accuracy":
-
-                $value = $result["accuracy"] ?? "-";
-
-                break;
-
-            case "Precision":
-
-                $value = $result["precision"] ?? "-";
-
-                break;
-
-            case "Recall":
-
-                $value = $result["recall"] ?? "-";
-
-                break;
-
-            case "F1 Score":
-
-                $value = $result["f1"] ?? "-";
-
-                break;
-
-            case "CV Score":
-
-                $value = $result["cv_score"] ?? "-";
-
-                break;
-
-            case "Execution Time (s)":
-
-                $value = $result["execution_time"] ?? "-";
-
-                break;
-
-            case "RMSE":
-
-                $value = $result["rmse"] ?? "-";
-
-                break;
-
-            case "R² Score":
-
-                $value = $result["r2"] ?? "-";
-
-                break;
-
-            case "Silhouette":
-
-                $value = $result["silhouette"] ?? "-";
-
-                break;
-
-            default:
-
-                $value = "-";
-        }
-
+    foreach ($values as $index => $value) {
         if (is_numeric($value)) {
-
-            $value = round($value, 4);
+            $value = round((float) $value, 4);
         }
-
-        $benchmarkSheet->setCellValueByColumnAndRow(
-
-            $column,
-
-            $row,
-
+        $benchmarkSheet->setCellValue(
+            \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($index + 1) . $row,
             $value
-
         );
-
-        $column++;
     }
 
     $row++;
@@ -2553,50 +2446,22 @@ if ($benchmarkSheet !== null) {
 
     if (!empty($benchmarkResults)) {
 
-        $taskType = strtolower(
-            $analysis["task_type"] ?? ""
-        );
-
-        /*
-        ------------------------------------------
-        Determine metric
-        ------------------------------------------
-        */
-
-        if ($taskType === "classification") {
-
-            $metricKey = "accuracy";
-            $metricTitle = "Accuracy";
-            $metricColumn = "B";
-        } elseif ($taskType === "regression") {
-
-            $metricKey = "r2";
-            $metricTitle = "R² Score";
-            $metricColumn = "C";
-        } else {
-
-            $metricKey = "silhouette";
-            $metricTitle = "Silhouette Score";
-            $metricColumn = "B";
-        }
-
-        /*
-        ------------------------------------------
-        Find rows containing usable values
-        ------------------------------------------
-        */
+        $metricTitle = "Primary Score";
 
         $chartStartRow = 4;
         $chartEndRow = 3;
 
         foreach ($benchmarkResults as $index => $result) {
-
-            if (
-                isset($result["algorithm"]) &&
-                isset($result[$metricKey]) &&
-                is_numeric($result[$metricKey])
-            ) {
-
+            $score = is_array($result)
+                ? ($result["primary_score"]
+                    ?? $result["score"]
+                    ?? $result["accuracy"]
+                    ?? $result["r2"]
+                    ?? $result["rmse"]
+                    ?? $result["silhouette"]
+                    ?? null)
+                : null;
+            if (is_numeric($score)) {
                 $chartEndRow = $chartStartRow + $index;
             }
         }
@@ -2618,7 +2483,7 @@ if ($benchmarkSheet !== null) {
             $categories = [
                 new DataSeriesValues(
                     "String",
-                    "'Benchmark'!\$A\$" . $chartStartRow . ":\$A\$" . $chartEndRow,
+                    "'Benchmark'!\$C\$" . $chartStartRow . ":\$C\$" . $chartEndRow,
                     null,
                     $chartEndRow - $chartStartRow + 1
                 )
@@ -2633,7 +2498,7 @@ if ($benchmarkSheet !== null) {
             $values = [
                 new DataSeriesValues(
                     "Number",
-                    "'Benchmark'!\$" . $metricColumn . "\$" . $chartStartRow . ":\$" . $metricColumn . "\$" . $chartEndRow,
+                    "'Benchmark'!\$F\$" . $chartStartRow . ":\$F\$" . $chartEndRow,
                     null,
                     $chartEndRow - $chartStartRow + 1
                 )
@@ -2652,7 +2517,7 @@ if ($benchmarkSheet !== null) {
                 [
                     new DataSeriesValues(
                         "String",
-                        "'Benchmark'!\$" . $metricColumn . "\$3",
+                        "'Benchmark'!\$F\$3",
                         null,
                         1
                     )

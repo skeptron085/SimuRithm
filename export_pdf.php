@@ -430,19 +430,11 @@ $recommendationReason = '';
 
 if (is_array($recommendation)) {
 
-    $recommendedAlgorithm = value(
-        $recommendation,
-        'recommended_algorithm',
-        value(
-            $recommendation,
-            'algorithm',
-            value(
-                $recommendation,
-                'model',
-                'N/A'
-            )
-        )
-    );
+    $recommendedAlgorithm = $recommendation['best_algorithm']
+        ?? $recommendation['recommended_algorithm']
+        ?? $recommendation['algorithm']
+        ?? $recommendation['model']
+        ?? 'N/A';
 
     $recommendationReason = value(
         $recommendation,
@@ -640,6 +632,19 @@ td {
 .small {
 
     font-size: 8px;
+
+}
+
+.benchmark table {
+
+    font-size: 7px;
+
+}
+
+.benchmark th,
+.benchmark td {
+
+    padding: 3px 2px;
 
 }
 
@@ -1294,7 +1299,7 @@ $html .= '
 
 $html .= '
 
-<div class="section page-break">
+<div class="section page-break benchmark">
 
 <h2>7. Benchmark Results</h2>
 
@@ -1310,9 +1315,21 @@ if (!empty($benchmark)) {
 
     <tr>
 
+        <th>Rank</th>
+
+        <th>Category</th>
+
         <th>Algorithm</th>
 
+        <th>Target</th>
+
+        <th>Primary Metric</th>
+
+        <th>Score</th>
+
         <th>Accuracy</th>
+
+        <th>Cross Validation</th>
 
         <th>Precision</th>
 
@@ -1320,9 +1337,13 @@ if (!empty($benchmark)) {
 
         <th>F1</th>
 
-        <th>R²</th>
+        <th>R² / RMSE</th>
 
-        <th>MSE</th>
+        <th>Silhouette</th>
+
+        <th>Time (sec)</th>
+
+        <th>Status</th>
 
     </tr>
 
@@ -1341,94 +1362,95 @@ if (!empty($benchmark)) {
             continue;
         }
 
-        $algorithm = value(
-            $result,
-            'algorithm',
-            value(
+        $algorithm = $result['algorithm'] ?? $result['model'] ?? 'N/A';
+        $primaryMetric = $result['primary_metric']
+            ?? (isset($result['accuracy']) ? 'Accuracy'
+                : (isset($result['r2']) ? 'R²'
+                    : (isset($result['silhouette']) ? 'Silhouette' : '-')));
+        $primaryScore = $result['primary_score']
+            ?? $result['accuracy']
+            ?? $result['r2']
+            ?? $result['silhouette']
+            ?? '-';
+        $crossValidation = $result['cv_score']
+            ?? $result['cross_validation_score']
+            ?? $result['cross_val_score']
+            ?? (!empty($result['cv_error']) ? 'Unavailable: ' . $result['cv_error'] : '-');
+        $status = !empty($result['error'])
+            ? 'Not run: ' . readableValue($result['error'])
+            : value(
                 $result,
-                'model',
-                'N/A'
-            )
-        );
+                'status',
+                !empty($result['is_recommended']) ? 'Recommended' : 'Completed'
+            );
+        $formatBenchmarkValue = function ($value) {
+            return is_numeric($value)
+                ? numberValue($value)
+                : e($value === null || $value === '' ? '-' : $value);
+        };
 
         $html .= '
 
         <tr>
 
         <td>
+        ' . e(!empty($result['error']) ? '-' : ($result['category_rank'] ?? '-')) . '
+        </td>
+
+        <td>
+        ' . e($result['category'] ?? $result['task'] ?? '-') . '
+        </td>
+
+        <td>
         ' . e($algorithm) . '
         </td>
 
         <td>
-        ' . numberValue(
-            value(
-                $result,
-                'accuracy',
-                null
-            )
-        ) . '
+        ' . e($result['target'] ?? '-') . '
         </td>
 
         <td>
-        ' . numberValue(
-            value(
-                $result,
-                'precision',
-                null
-            )
-        ) . '
+        ' . e($primaryMetric) . '
         </td>
 
         <td>
-        ' . numberValue(
-            value(
-                $result,
-                'recall',
-                null
-            )
-        ) . '
+        ' . $formatBenchmarkValue($primaryScore) . '
         </td>
 
         <td>
-        ' . numberValue(
-            value(
-                $result,
-                'f1',
-                value(
-                    $result,
-                    'f1_score',
-                    null
-                )
-            )
-        ) . '
+        ' . $formatBenchmarkValue($result['accuracy'] ?? '-') . '
         </td>
 
         <td>
-        ' . numberValue(
-            value(
-                $result,
-                'r2',
-                value(
-                    $result,
-                    'r2_score',
-                    null
-                )
-            )
-        ) . '
+        ' . $formatBenchmarkValue($crossValidation) . '
         </td>
 
         <td>
-        ' . numberValue(
-            value(
-                $result,
-                'mse',
-                value(
-                    $result,
-                    'mean_squared_error',
-                    null
-                )
-            )
-        ) . '
+        ' . $formatBenchmarkValue($result['precision'] ?? '-') . '
+        </td>
+
+        <td>
+        ' . $formatBenchmarkValue($result['recall'] ?? '-') . '
+        </td>
+
+        <td>
+        ' . $formatBenchmarkValue($result['f1_score'] ?? $result['f1'] ?? '-') . '
+        </td>
+
+        <td>
+        ' . $formatBenchmarkValue($result['r2'] ?? $result['rmse'] ?? '-') . '
+        </td>
+
+        <td>
+        ' . $formatBenchmarkValue($result['silhouette'] ?? '-') . '
+        </td>
+
+        <td>
+        ' . $formatBenchmarkValue($result['execution_time'] ?? '-') . '
+        </td>
+
+        <td>
+        ' . e($status) . '
         </td>
 
         </tr>

@@ -1,32 +1,28 @@
 <?php
 
-if (
-    !isset($_POST['analysis'])
-) {
+declare(strict_types=1);
 
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    http_response_code(405);
+    header("Content-Type: text/plain; charset=UTF-8");
+    exit("Method Not Allowed.");
+}
+
+if (!isset($_POST["analysis"])) {
     http_response_code(400);
-
+    header("Content-Type: text/plain; charset=UTF-8");
     exit("No analysis data received.");
 }
 
-$analysis = $_POST['analysis'];
+$analysis = json_decode($_POST["analysis"], true);
 
-?>
+if (!is_array($analysis)) {
+    http_response_code(400);
+    header("Content-Type: text/plain; charset=UTF-8");
+    exit("Invalid analysis data.");
+}
 
-<form
-    id="pdfForm"
-    method="POST"
-    action="../export_pdf.php">
+session_start();
+$_SESSION["simurithm_analysis"] = $analysis;
 
-    <input
-        type="hidden"
-        name="analysis"
-        value="<?= htmlspecialchars($analysis, ENT_QUOTES); ?>">
-
-</form>
-
-<script>
-    document.getElementById(
-        "pdfForm"
-    ).submit();
-</script>
+require_once __DIR__ . "/../export_excel.php";
