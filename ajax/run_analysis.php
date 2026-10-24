@@ -692,9 +692,31 @@ foreach ($algorithmsByCategory as $modelCategory => $categoryModels) {
 
     if ($httpCode < 200 || $httpCode >= 300 || !($result["success"] ?? false)) {
         $serviceMessage = $result["message"] ?? "Analysis failed for {$modelCategory}.";
+        $validationErrors = $result["validation_errors"] ?? [];
+        if (!is_array($validationErrors)) {
+            $validationErrors = [];
+        }
+        if (
+            $validationErrors === []
+            && isset($result["details"])
+            && is_array($result["details"])
+        ) {
+            $validationErrors = $result["details"]["validation_errors"] ?? [];
+        }
+        if (!is_array($validationErrors)) {
+            $validationErrors = [];
+        }
+        $validationErrors = array_values(array_filter(
+            $validationErrors,
+            "is_string"
+        ));
+        if ($validationErrors !== []) {
+            $serviceMessage .= " " . implode(" ", $validationErrors);
+        }
         $categoryErrors[] = [
             "category" => $modelCategory,
             "message" => $serviceMessage,
+            "validation_errors" => $validationErrors,
             "http_code" => $httpCode
         ];
         continue;

@@ -150,7 +150,7 @@ require_once 'config/config.php';
 
     <!-- Dashboard -->
 
-    <script src="assets/js/dashboard.js?v=20260929-2"></script>
+    <script src="assets/js/dashboard.js?v=20261024-1"></script>
 
     <!-- Export -->
 
@@ -160,7 +160,7 @@ require_once 'config/config.php';
 
     <script src="assets/js/upload.js"></script>
 
-    <script src="assets/js/analysis_config.js?v=20260929-2"></script>
+    <script src="assets/js/analysis_config.js?v=20261024-1"></script>
 
     <!-- Benchmark -->
 

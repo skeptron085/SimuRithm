@@ -1915,7 +1915,7 @@ function loadBenchmark(results){
 
         html+=`
 
-        <tr>
+        <tr class="${result.error ? 'table-warning' : ''}">
 
             <td>
 
@@ -2013,7 +2013,7 @@ function loadBenchmark(results){
 
             </td>
 
-            <td>
+            <td class="${result.error ? 'text-danger fw-semibold' : ''}">
 
                 ${escapeHtml(String(statusMessage))}
 

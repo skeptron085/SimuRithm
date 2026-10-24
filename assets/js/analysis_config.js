@@ -1188,6 +1188,16 @@ function runConfiguredAnalysis(){
             const failedBenchmarks = benchmarkResults
                 .filter(function(benchmark){ return Boolean(benchmark.error); }).length;
             const successfulBenchmarks = benchmarkResults.length - failedBenchmarks;
+            const benchmarkFailureDetails = benchmarkResults
+                .filter(function(benchmark){ return Boolean(benchmark.error); })
+                .map(function(benchmark){
+                    const model = [
+                        benchmark.category,
+                        benchmark.algorithm,
+                        benchmark.target ? "target " + benchmark.target : null
+                    ].filter(Boolean).join(" / ");
+                    return model + ": " + String(benchmark.error);
+                });
             const datasetStatus = $("#datasetStatus").removeClass();
             if(failedBenchmarks > 0 && successfulBenchmarks === 0){
                 datasetStatus.addClass("badge bg-danger").text("No Compatible Models");
@@ -1214,6 +1224,20 @@ function runConfiguredAnalysis(){
 
                     window.showWorkflowPage("results");
 
+                }
+
+                if(benchmarkFailureDetails.length > 0){
+                    const visibleFailures = benchmarkFailureDetails.slice(0, 5);
+                    const remainingCount = benchmarkFailureDetails.length - visibleFailures.length;
+                    const summary = successfulBenchmarks > 0
+                        ? "Some algorithms could not run with the selected data. Successful results are still available."
+                        : "No selected algorithms could run with the selected data.";
+                    const details = visibleFailures.join("\n\n")
+                        + (remainingCount > 0
+                            ? "\n\nAnd " + remainingCount + " more incompatible result(s). See the benchmark table."
+                            : "");
+
+                    showWarning(summary + "\n\n" + details);
                 }
 
             }, 600);
